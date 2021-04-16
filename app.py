@@ -118,7 +118,7 @@ def Ebay():
     average= sume/len(precios)
     average= round(average,2)
 
-    dicJson = {"Promedio":average, "Maximo":maxi,"Minimo": mini}
+    dicJson = {"Promedio":average, "Maximo":maxi,"Minimo": mini,"longitud":len(precios)}
     return json.dumps(dicJson),200
 
 ## Busqueda en Olx

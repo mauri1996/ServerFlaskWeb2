@@ -1,5 +1,5 @@
 ### Ebay
-GET http://localhost:5000/searchEbay?articulo=Tacho Contenedor Bote Basurero
+GET http://localhost:5000/searchEbay?articulo=Tarjeta De Video Nvidia Gtx 1060 3gb Msi Gaming X
 
 
 ### Olx
