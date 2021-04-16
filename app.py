@@ -97,12 +97,8 @@ def Ebay():
     precios = soup_Ebay.find_all("span", {"class": "s-item__price"})
 
     if(len(precios) == 0):
-        Name = articulo.split(' ')
-        articulo = Name[0]+' '+Name[1]+' '+Name[2]+' '+Name[3]
-        URL = "https://www.ebay.com/sch/i.html?_from=R40&_trksid=m570.l1313&_nkw=" +articulo   
-        page_Ebay = requests.get(URL)
-        soup_Ebay = BeautifulSoup(page_Ebay.content, 'html.parser')  
-        precios = soup_Ebay.find_all("span", {"class": "s-item__price"})  
+        dicJson = {}
+        return json.dumps(dicJson),404
     try:       
         sume = 0
         maxi = 0
@@ -125,8 +121,45 @@ def Ebay():
         maxi = 0
         mini = 0
 
-    dicJson = {"Promedio":average, "Maximo":maxi,"Minimo": mini, "Busqueda": articulo}
-    return json.dumps(dicJson)
-    
+    dicJson = {"Promedio":average, "Maximo":maxi,"Minimo": mini}
+    return json.dumps(dicJson),200
+
+## Busqueda en Olx
+@app.route('/searchOlx', methods = ['GET'])
+def Olx():
+    articulo = request.args.get('articulo')    
+    URL = "https://www.olx.com.ec/items/q-"+ articulo    
+    page_Olx = requests.get(URL)
+    soup_Olx = BeautifulSoup(page_Olx.content, 'html.parser')
+    precios = soup_Olx.find_all("span", {"data-aut-id": "itemPrice"})
+
+    if(len(precios) == 0):
+        dicJson = {}
+        return json.dumps(dicJson),404
+    try:       
+        sume = 0
+        maxi = 0
+        mini = 9999999
+
+        for price in precios:
+            num = float(price.contents[0].replace('$',''))
+            sume = sume + num
+            if(num<mini):
+                mini=num
+            if (num>maxi):
+                maxi=num
+        if (len(precios) != 0):
+            average= sume/len(precios)
+            average= round(average,2)
+        else:
+            average = 0
+    except :
+        average = 0
+        maxi = 0
+        mini = 0
+
+    dicJson = {"Promedio":average, "Maximo":maxi,"Minimo": mini}
+    return json.dumps(dicJson),200
+
 if __name__ == '__main__':
     app.run(port=5000)

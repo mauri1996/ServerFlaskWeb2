@@ -1,7 +1,9 @@
-###
-GET http://localhost:5000/searchEbay?articulo=Tacho Contenedor Bote Basurero - Basura Reciclaje 240 Litros
+### Ebay
+GET http://localhost:5000/searchEbay?articulo=Tacho Contenedor Bote Basurero
 
 
+### Olx
+GET http://localhost:5000/searchOlx?articulo=laptop hp 
 
 
 ### Mercado libre 
