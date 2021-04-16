@@ -99,27 +99,24 @@ def Ebay():
     if(len(precios) == 0):
         dicJson = {}
         return json.dumps(dicJson),404
-    try:       
-        sume = 0
-        maxi = 0
-        mini = 9999999
+         
+    sume = 0
+    maxi = 0
+    mini = 9999999
 
-        for price in precios:
+    for price in precios:
+        try:
             num = float(price.contents[0].replace('USD',''))
             sume = sume + num
             if(num<mini):
                 mini=num
             if (num>maxi):
-                maxi=num
-        if (len(precios) != 0):
-            average= sume/len(precios)
-            average= round(average,2)
-        else:
-            average = 0
-    except :
-        average = 0
-        maxi = 0
-        mini = 0
+                maxi=num        
+        except:
+            pass
+
+    average= sume/len(precios)
+    average= round(average,2)
 
     dicJson = {"Promedio":average, "Maximo":maxi,"Minimo": mini}
     return json.dumps(dicJson),200
@@ -136,27 +133,24 @@ def Olx():
     if(len(precios) == 0):
         dicJson = {}
         return json.dumps(dicJson),404
-    try:       
-        sume = 0
-        maxi = 0
-        mini = 9999999
+        
+    sume = 0
+    maxi = 0
+    mini = 9999999
 
-        for price in precios:
+    for price in precios:
+        try:
             num = float(price.contents[0].replace('$',''))
             sume = sume + num
             if(num<mini):
                 mini=num
             if (num>maxi):
                 maxi=num
-        if (len(precios) != 0):
-            average= sume/len(precios)
-            average= round(average,2)
-        else:
-            average = 0
-    except :
-        average = 0
-        maxi = 0
-        mini = 0
+        except:
+            pass
+    
+    average= sume/len(precios)
+    average= round(average,2)
 
     dicJson = {"Promedio":average, "Maximo":maxi,"Minimo": mini}
     return json.dumps(dicJson),200
