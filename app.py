@@ -23,23 +23,34 @@ def index():
     soup = BeautifulSoup(page.content, 'html.parser')
 
     NombreArticulo = soup.find_all("h1", {"class": "ui-pdp-title"})[0].contents[0]
-    precio = soup.find_all("span", {"class": "price-tag-fraction"})[0].contents[0]
-    url = soup.find_all("a", {"class": "ui-pdp-media__action ui-box-component__action"})[0]['href']
+    precio = soup.find_all("span", {"class": "price-tag-fraction"})[0].contents[0]        
+    try:
+        url = soup.find_all("a", {"class": "ui-pdp-media__action ui-box-component__action"})[0]['href']
     
-    # fase 2
-    page_user = requests.get(url)
-    soup_user = BeautifulSoup(page_user.content, 'html.parser')
-    Califications = soup_user.find_all("span", {"class": "buyers-feedback-qualification"})
+    except:
+        url = soup.find_all("a", {"class": "ui-pdp-action-modal__link"})[2]['href']       
+        # fase 2.1        
+        page_user_middleware = requests.get(url)
+        soup_user_middleware = BeautifulSoup(page_user_middleware.content, 'html.parser')
+        
+        data = soup_user_middleware.find_all("p", {"class": "feedback-profile-link"})[0]
+        url = data.find_all("a")[0]
+        url = url['href']
 
-    calification_points = []
-    for C in Califications:
-        calification_points.append(C.contents[4])
-    
-    reputation = soup_user.find_all("div", {"class": "data-level__wrapper"})[0]
-    reputation= reputation.find_all("span", {"class": "data-level__number"})
-    recomendado = reputation[0].contents[0]
-    ventas_completadas = reputation[1].contents[0]
-    años_vendiendo = reputation[2].contents[0]
+    finally:
+        # fase 2
+        page_user = requests.get(url)
+        soup_user = BeautifulSoup(page_user.content, 'html.parser')
+        Califications = soup_user.find_all("span", {"class": "buyers-feedback-qualification"})
+        calification_points = []
+        for C in Califications:
+            calification_points.append(C.contents[4])    
+        reputation = soup_user.find_all("div", {"class": "data-level__wrapper"})[0]
+        reputation= reputation.find_all("span", {"class": "data-level__number"})
+        recomendado = reputation[0].contents[0]
+        ventas_completadas = reputation[1].contents[0]
+        años_vendiendo = reputation[2].contents[0]
+   
     
     # fase 3
     new_url = 'https://listado.mercadolibre.com.ec/'+NombreArticulo
@@ -49,7 +60,7 @@ def index():
     prices = soup_other_article.find_all("span", {"class": "price-tag-fraction"})
     sume = 0
     for price in prices:
-        sume = sume + int(price.contents[0])
+        sume = sume + float(price.contents[0])
     average= sume/len(prices)
     
 
