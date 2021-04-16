@@ -60,9 +60,10 @@ def index():
     prices = soup_other_article.find_all("span", {"class": "price-tag-fraction"})
     sume = 0
     for price in prices:
-        sume = sume + float(price.contents[0])
+        num = price.contents[0]        
+        sume = sume + float(num.replace(".",""))
     average= sume/len(prices)
-    
+    average= round(average,2)
 
     dicJson = {"Nombre" : NombreArticulo,"Precio":precio ,"Puntos":calification_points, "Recomendado": recomendado, "Ventas":ventas_completadas,"Anios":años_vendiendo,"Promedio":average }
     return json.dumps(dicJson)
