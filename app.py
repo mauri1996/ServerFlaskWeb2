@@ -106,7 +106,8 @@ def Ebay():
 
     for price in precios:
         try:
-            num = float(price.contents[0].replace('USD',''))
+            # num = float(price.contents[0].replace('USD','')) #Desarrollo
+            num = float(price.contents[0].replace('$','')) # produccion
             sume = sume + num
             if(num<mini):
                 mini=num
