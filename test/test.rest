@@ -1,0 +1,8 @@
+###
+GET http://localhost:5000/searchEbay?articulo=Tacho Contenedor Bote Basurero - Basura Reciclaje 240 Litros
+
+
+
+
+### Mercado libre 
+Get http://localhost:5000/search?url= 
