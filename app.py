@@ -25,6 +25,9 @@ def index():
     NombreArticulo = soup.find_all("h1", {"class": "ui-pdp-title"})[0].contents[0]
     NombreArticulo= NombreArticulo.replace("/"," ")
     precio = soup.find_all("span", {"class": "price-tag-fraction"})[0].contents[0]        
+    Image_articulo = soup.find_all("figure", {"class": "ui-pdp-gallery__figure"})[0]
+    Image_articulo= Image_articulo.find_all("img")[0]['data-zoom']
+    
     try:
         url = soup.find_all("a", {"class": "ui-pdp-media__action ui-box-component__action"})[0]['href']
     
@@ -42,6 +45,7 @@ def index():
         # fase 2
         page_user = requests.get(url)
         soup_user = BeautifulSoup(page_user.content, 'html.parser')
+        name_vendedor = soup_user.find_all("h3", {"class": "store-info__name"})[0].contents[0]        
         Califications = soup_user.find_all("span", {"class": "buyers-feedback-qualification"})
         calification_points = []
         for C in Califications:
@@ -79,7 +83,7 @@ def index():
         average= round(average,2)
     else:
         average = 0
-    dicJson = {"Nombre" : NombreArticulo,"Precio":precio ,"Puntos":calification_points, "Recomendado": recomendado, "Ventas":ventas_completadas,"Time":años_vendiendo,"typeTime":time,"Promedio":average, "Maximo":maxi,"Minimo": mini}
+    dicJson = {"Nombre" : NombreArticulo,"Image":Image_articulo,"Vendedor":name_vendedor,"Precio":precio ,"Puntos":calification_points, "Recomendado": recomendado, "Ventas":ventas_completadas,"Time":años_vendiendo,"typeTime":time,"Promedio":average, "Maximo":maxi,"Minimo": mini}
     return json.dumps(dicJson)
 
 
