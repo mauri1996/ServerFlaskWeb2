@@ -130,23 +130,27 @@ def Ebay():
 
     for item in data:
         image = item['src']
-        otras_opciones_img.append(image)    
+        otras_opciones_img.append(image) 
+           
     otras_opciones_url = []
     name_opciones=[]
     data = soup_Ebay.find_all("a", {"class": "s-item__link"})
 
     for item in data:
         url = item['href']
+        otras_opciones_url.append(url)
         name = str(item.find_all("h3")[0].contents[0])    
         char = name.split()
-        if(char[0]!='<'):
+        if(char[0]!='<span'):
             name_opciones.append(name)
-            otras_opciones_url.append(url) 
+        else:
+            name = str(item.find_all("h3")[0].contents[1])
+            name_opciones.append(name)  
     
     ## formar json
     datos = []
-    for i in range(0,len(name_opciones)):
-        datos.append({name_opciones[0] : { 'url': otras_opciones_url[i], 'image': otras_opciones_img[i]}})
+    for i in range(0,len(name_opciones)-1):
+        datos.append({'Nombre': name_opciones[i],  'url': otras_opciones_url[i], 'image': otras_opciones_img[i]})
 
     dicJson = {"Promedio":average, "Maximo":maxi,"Minimo": mini, "Otros": datos}
     return json.dumps(dicJson),200
