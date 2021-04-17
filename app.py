@@ -106,7 +106,7 @@ def Ebay():
 
     for price in precios:
         try:
-            # num = float(price.contents[0].replace('USD','')) #Desarrollo
+            #num = float(price.contents[0].replace('USD','')) #Desarrollo
             num = float(price.contents[0].replace('$','')) # produccion
             sume = sume + num
             if(num<mini):
@@ -119,7 +119,36 @@ def Ebay():
     average= sume/len(precios)
     average= round(average,2)
 
-    dicJson = {"Promedio":average, "Maximo":maxi,"Minimo": mini,"longitud":len(precios)}
+    ### obtener datos generales
+
+    otras_opciones_img = []
+    data = soup_Ebay.find_all("img", {"class": "s-item__image-img"})
+
+    if(len(data) == 0):
+        dicJson = {}
+        return json.dumps(dicJson),404
+
+    for item in data:
+        image = item['src']
+        otras_opciones_img.append(image)    
+    otras_opciones_url = []
+    name_opciones=[]
+    data = soup_Ebay.find_all("a", {"class": "s-item__link"})
+
+    for item in data:
+        url = item['href']
+        name = str(item.find_all("h3")[0].contents[0])    
+        char = name.split()
+        if(char[0]!='<'):
+            name_opciones.append(name)
+            otras_opciones_url.append(url) 
+    
+    ## formar json
+    datos = []
+    for i in range(0,len(name_opciones)):
+        datos.append({name_opciones[0] : { 'url': otras_opciones_url[i], 'image': otras_opciones_img[i]}})
+
+    dicJson = {"Promedio":average, "Maximo":maxi,"Minimo": mini, "Otros": datos}
     return json.dumps(dicJson),200
 
 ## Busqueda en Olx

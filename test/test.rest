@@ -1,6 +1,5 @@
 ### Ebay
-GET http://localhost:5000/searchEbay?articulo=Tarjeta De Video Nvidia Gtx 1060 3gb Msi Gaming X
-
+GET http://localhost:5000/searchEbay?articulo=Tarjeta De Video
 
 ### Olx
 GET http://localhost:5000/searchOlx?articulo=laptop hp 
