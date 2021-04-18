@@ -67,24 +67,36 @@ def MercadoLibre():
     new_url = 'https://listado.mercadolibre.com.ec/'+NombreArticulo
     page_other_article = requests.get(new_url)
     soup_other_article = BeautifulSoup(page_other_article.content, 'html.parser')
-
-    prices = soup_other_article.find_all("span", {"class": "price-tag-fraction"})
+    card = soup_other_article.find_all("img", {"class": "ui-search-result-image__element"})
+    datos = []
     sume = 0
     maxi = 0
     mini = 9999999
-    for price in prices: 
-        num = float(price.contents[0].replace(".",""))
-        sume = sume + num
-        if(num<mini):
-            mini=num
-        if (num>maxi):
-            maxi=num
-    if (len(prices) != 0):
-        average= sume/len(prices)
-        average= round(average,2)
-    else:
-        average = 0
-    dicJson = {"Nombre" : NombreArticulo,"Image":Image_articulo,"Vendedor":name_vendedor,"Precio":precio ,"Puntos":calification_points, "Recomendado": recomendado, "Ventas":ventas_completadas,"Time":años_vendiendo,"typeTime":time,"Promedio":average, "Maximo":maxi,"Minimo": mini}
+
+    for item in card:
+        # obtener precios
+        price = soup_other_article.find_all("a", {"title": item['alt']})
+        #print(price[1].find_all("span", {"class": "price-tag-fraction"}))
+        try:
+            num = float(price[1].find_all("span", {"class": "price-tag-fraction"})[0].contents[0])        
+        except:
+            search = soup_other_article.find_all("div", {"class": "andes-card andes-card--flat andes-card--default ui-search-result ui-search-result--core andes-card--padding-default"})
+            for c in search:
+                if (item['alt'] == c.contents[0].contents[0]['title']):
+                    num = float(c.contents[1].find_all("span", {"class": "price-tag-fraction"})[0].contents[0])
+        finally:
+            sume = sume + num
+            if(num<mini):
+                mini=num
+            if (num>maxi):
+                maxi=num
+            ## generacion de json
+            datos.append({'Nombre': item['alt'],  'Url': price[0]['href'], 'Image': item['data-src'], 'Precio': num})            
+    average= sume/len(card)
+    average = round(average,2) 
+
+    dicJson = {"Nombre" : NombreArticulo,"Image":Image_articulo,"Vendedor":name_vendedor,"Precio":precio ,"Puntos":calification_points, "Recomendado": recomendado, "Ventas":ventas_completadas,"Time":años_vendiendo,"typeTime":time,"Promedio":average, "Maximo":maxi,"Minimo": mini,'otrosDatos': datos}
+    
     return json.dumps(dicJson)
 
 ## Busqueda en Ebay
@@ -99,7 +111,8 @@ def Ebay():
     if(len(precios) == 0):
         dicJson = {}
         return json.dumps(dicJson),404
-         
+
+    otros_precios = []
     sume = 0
     maxi = 0
     mini = 9999999
@@ -112,7 +125,8 @@ def Ebay():
             if(num<mini):
                 mini=num
             if (num>maxi):
-                maxi=num        
+                maxi=num    
+            otros_precios.append(num)    
         except:
             pass
 
@@ -120,7 +134,7 @@ def Ebay():
     average= round(average,2)
 
     ### obtener datos generales
-
+    
     otras_opciones_img = []
     data = soup_Ebay.find_all("img", {"class": "s-item__image-img"})
 
@@ -144,13 +158,16 @@ def Ebay():
         if(char[0]!='<span'):
             name_opciones.append(name)
         else:
-            name = str(item.find_all("h3")[0].contents[1])
+            try:
+                name = str(item.find_all("h3")[0].contents[1])
+            except:
+                name = str(item.find_all("h3")[0].contents[0].contents[0])
             name_opciones.append(name)  
     
     ## formar json
     datos = []
     for i in range(0,len(name_opciones)-1):
-        datos.append({'Nombre': name_opciones[i],  'url': otras_opciones_url[i], 'image': otras_opciones_img[i]})
+        datos.append({'Nombre': name_opciones[i],  'Url': otras_opciones_url[i], 'Image': otras_opciones_img[i], 'Precio': otros_precios[i]})
 
     dicJson = {"Promedio":average, "Maximo":maxi,"Minimo": mini, "Otros": datos}
     return json.dumps(dicJson),200

@@ -6,4 +6,4 @@ GET http://localhost:5000/searchOlx?articulo=laptop hp
 
 
 ### Mercado libre 
-Get http://localhost:5000/search?url= 
+Get http://localhost:5000/search?url=https://articulo.mercadolibre.com.ec/MEC-430292466-hp-pavilion-x360-14-dh2041-core-5-1035g1-256gb-8gb-inc-iva-_JM?searchVariation=80392576392#searchVariation=80392576392&position=1&type=item&tracking_id=8fa72f62-c032-4640-b861-1fb770941208
