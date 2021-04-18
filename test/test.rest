@@ -1,5 +1,5 @@
 ### Ebay
-GET http://localhost:5000/searchEbay?articulo=Tarjeta De Video
+GET http://localhost:5000/searchEbay?articulo=ryzen 3600
 
 ### Olx
 GET http://localhost:5000/searchOlx?articulo=laptop hp 
