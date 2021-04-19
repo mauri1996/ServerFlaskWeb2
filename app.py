@@ -105,7 +105,7 @@ def MercadoLibre():
             fas3 = buscarInfo(NombreArticulo)
 
         except:
-            fas2 = [0,0,0,0,0,""]
+            fas2 = ['años',0,0,0,0,""]
             fas3 = buscarInfo(NombreArticulo)
 
     finally:        
