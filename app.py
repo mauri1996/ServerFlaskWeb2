@@ -10,6 +10,9 @@ import requests
 from bs4 import BeautifulSoup
 import json
 from flask_cors import CORS, cross_origin
+import re
+from selenium import webdriver
+import time
 
 app= Flask(__name__)
 CORS(app)
@@ -73,6 +76,49 @@ def MercadoLibre():
         average = round(average,2) 
         return [average,mini,maxi,datos]
 
+    def getComentarios(nombreVendedor):
+        import os
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.binary_location= os.environ.get("GOOGLE_CHROME_BIN")
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--no-sandbox")
+
+        driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=(chrome_options))
+
+        #PATH= "driver/chromedriver.exe"
+        #driver = webdriver.Chrome(executable_path=PATH, chrome_options=chrome_options)
+        
+        url = "https://www.mercadolibre.com.ec/perfil/"+nombreVendedor
+        driver.get(url)
+        time.sleep(1)
+        element1 = driver.find_element_by_css_selector("a.buyers-feedback-bar__items.buyers-feedback-bar--negative")
+
+        driver.execute_script("arguments[0].scrollIntoView();", element1)
+        driver.execute_script("arguments[0].click();", element1)
+        time.sleep(1)
+        NUM_COMMENTS = 20
+        contador = 0
+        try:
+            while (contador < NUM_COMMENTS):
+                more = driver.find_element_by_css_selector("a.feedback-offset__link.show-link")
+                driver.execute_script("arguments[0].scrollIntoView();", more)
+                driver.execute_script("arguments[0].click();", more)
+                contador = contador + 1
+        except:
+            pass
+        element = driver.find_elements_by_css_selector(".rating__list-item")
+        comentarios = []
+        fraude_coincidencias = 0
+
+        for item in element:
+            comentario = item.find_element_by_css_selector("p").text
+            x = re.findall("estaf*|rob*|fraud*|mal*", comentario.lower())
+            fraude_coincidencias = fraude_coincidencias + len(x)
+            comentarios.append(comentario)
+        return [fraude_coincidencias , comentarios]
+
+
     URL = request.args.get('url')
     # fase 1 - Datos generales del articulo
     page = requests.get(URL)
@@ -91,6 +137,7 @@ def MercadoLibre():
         url = soup.find_all("a", {"class": "ui-pdp-media__action ui-box-component__action"})[0]['href']
         fas2 = fase2(url)
         fas3 = buscarInfo(NombreArticulo)
+        MercadoL = getComentarios(fas2[5])
 
     except:        
         url = soup.find_all("a", {"class": "ui-pdp-action-modal__link"})[-1]['href']
@@ -103,13 +150,13 @@ def MercadoLibre():
             url = url['href']
             fas2 = fase2(url)
             fas3 = buscarInfo(NombreArticulo)
-
+            MercadoL = getComentarios(fas2[5])
         except:
             fas2 = ['años',0,0,0,0,""]
             fas3 = buscarInfo(NombreArticulo)
-
+            MercadoL = ['',[]]
     finally:        
-        dicJson = {"Nombre" : NombreArticulo,"Image":Image_articulo,"Vendedor":fas2[5],"Precio":precio ,"Puntos":fas2[1], "Recomendado": fas2[2], "Ventas":fas2[3],"Time":fas2[4],"typeTime":fas2[0],"Promedio":fas3[0], "Maximo":fas3[2],"Minimo": fas3[1],'otrosDatos': fas3[3]}
+        dicJson = {"Nombre" : NombreArticulo,"Image":Image_articulo,"Vendedor":fas2[5],"Precio":precio ,"Puntos":fas2[1], "Recomendado": fas2[2], "Ventas":fas2[3],"Time":fas2[4],"typeTime":fas2[0],"Promedio":fas3[0], "Maximo":fas3[2],"Minimo": fas3[1],'otrosDatos': fas3[3],'mensajes' :MercadoL[0] , 'coinicidencias':MercadoL[1]}
         return json.dumps(dicJson)
 
 ## Busqueda en Ebay

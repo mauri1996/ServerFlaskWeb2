@@ -6,7 +6,7 @@ GET http://localhost:5000/searchOlx?articulo=laptop hp
 
 
 ### Mercado libre 
-Get http://localhost:5000/search?url=https://articulo.mercadolibre.com.ec/MEC-430292466-hp-pavilion-x360-14-dh2041-core-5-1035g1-256gb-8gb-inc-iva-_JM?searchVariation=80392576392#searchVariation=80392576392&position=1&type=item&tracking_id=8fa72f62-c032-4640-b861-1fb770941208
+Get http://localhost:5000/search?url=https://articulo.mercadolibre.com.ec/MEC-430509150-samsung-a11-a12-a21s-a31-a71-a32-a52-a72-_JM#c_id=/home/category/deal-items/element&c_uid=33a6fac2-6cab-40a5-a900-b78de859c787
 
 
 ### Mercado libre sin modal
