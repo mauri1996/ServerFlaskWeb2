@@ -93,29 +93,37 @@ def MercadoLibre():
         driver.get(url)
         time.sleep(1)
         element1 = driver.find_element_by_css_selector("a.buyers-feedback-bar__items.buyers-feedback-bar--negative")
+        s= element1.text
+        cantidad_negativa= s[s.find("(")+1:s.find(")")]
+        if int(cantidad_negativa) > 0:
+            driver.execute_script("arguments[0].scrollIntoView();", element1)
+            driver.execute_script("arguments[0].click();", element1)
+            time.sleep(0.5)
+            NUM_COMMENTS = 3
+            contador = 0
+            try:
+                while (contador < NUM_COMMENTS):
+                    more = driver.find_element_by_css_selector("a.feedback-offset__link.show-link")
+                    driver.execute_script("arguments[0].scrollIntoView();", more)
+                    driver.execute_script("arguments[0].click();", more)
+                    contador = contador + 1
+                    time.sleep(0.5)
+            except:
+                pass
+            element = driver.find_elements_by_css_selector(".rating__list-item")
+            comentarios = []
+            fraude_coincidencias = 0
 
-        driver.execute_script("arguments[0].scrollIntoView();", element1)
-        driver.execute_script("arguments[0].click();", element1)
-        time.sleep(1)
-        NUM_COMMENTS = 20
-        contador = 0
-        try:
-            while (contador < NUM_COMMENTS):
-                more = driver.find_element_by_css_selector("a.feedback-offset__link.show-link")
-                driver.execute_script("arguments[0].scrollIntoView();", more)
-                driver.execute_script("arguments[0].click();", more)
-                contador = contador + 1
-        except:
-            pass
-        element = driver.find_elements_by_css_selector(".rating__list-item")
-        comentarios = []
-        fraude_coincidencias = 0
-
-        for item in element:
-            comentario = item.find_element_by_css_selector("p").text
-            x = re.findall("estaf*|rob*|fraud*|mal*", comentario.lower())
-            fraude_coincidencias = fraude_coincidencias + len(x)
-            comentarios.append(comentario)
+            for item in element:
+                comentario = item.find_element_by_css_selector("p").text
+                if comentario != '':
+                    x = re.findall(r'estaf|rob|fraud|mal|pesim', comentario.lower())
+                    fraude_coincidencias = fraude_coincidencias + len(x)
+                    comentarios.append(comentario)
+        else:
+            comentarios = []
+            fraude_coincidencias = 0
+            
         return [fraude_coincidencias , comentarios]
 
 
